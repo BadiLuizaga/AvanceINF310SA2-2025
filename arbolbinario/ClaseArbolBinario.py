@@ -212,7 +212,7 @@ class ArbolBinario:
                 if nodo.getHijoIzquierdo():
                     stack.append((nodo.getHijoIzquierdo(), False))
         return res
-# ============================================================
+    # ============================================================
     # 8) Altura
     # ============================================================
     def altura_recursiva(self):
@@ -223,8 +223,10 @@ class ArbolBinario:
         return self._altura_rec(self.raiz)
 
     def _altura_rec(self, nodo):
+        # Caso base: subárbol vacío tiene altura 0.
         if nodo is None:
             return 0
+        # Caso recursivo: 1 + máximo entre alturas de los subárboles.
         return 1 + max(
             self._altura_rec(nodo.getHijoIzquierdo()),
             self._altura_rec(nodo.getHijoDerecho()),
@@ -232,20 +234,23 @@ class ArbolBinario:
 
     def altura_iterativa(self):
         """Altura por BFS (niveles)."""
+        # Recorre nivel por nivel; cada vuelta del while suma 1 nivel.
         if self.raiz is None:
             return 0
         from collections import deque
 
-        cola = deque([self.raiz])
+        cola = deque([self.raiz]) # cola inicial con la raiz
         niveles = 0
         while cola:
+             # Procesa todos los nodos del nivel actual.
             for _ in range(len(cola)):
                 n = cola.popleft()
+                # Encola hijos del siguiente nivel si existen.
                 if n.getHijoIzquierdo():
                     cola.append(n.getHijoIzquierdo())
                 if n.getHijoDerecho():
                     cola.append(n.getHijoDerecho())
-            niveles += 1
+            niveles += 1 # terminó de recorrer un nivel completo
         return niveles
 
     # ============================================================
@@ -253,11 +258,14 @@ class ArbolBinario:
     # ============================================================
     def cantidad_recursiva(self):
         """Cantidad total de nodos (recursivo)."""
+        # Devuelve el número total de nodos del árbol
         return self._cantidad_rec(self.raiz)
 
     def _cantidad_rec(self, nodo):
+        # Caso base: subárbol vacío aporta 0.
         if nodo is None:
             return 0
+        # Caso recursivo: 1 (nodo actual) + nodos(izq) + nodos(der).
         return (
             1
             + self._cantidad_rec(nodo.getHijoIzquierdo())
@@ -266,6 +274,7 @@ class ArbolBinario:
 
     def cantidad_iterativa(self):
         """Cantidad total de nodos (BFS)."""
+        # Cuenta nodos con un BFS usando una cola.
         if self.raiz is None:
             return 0
         from collections import deque
@@ -274,7 +283,8 @@ class ArbolBinario:
         conteo = 0
         while cola:
             n = cola.popleft()
-            conteo += 1
+            conteo += 1 # cuenta el nodo desencolado
+            # Encola hijos si existen para seguir recorriendo.
             if n.getHijoIzquierdo():
                 cola.append(n.getHijoIzquierdo())
             if n.getHijoDerecho():
