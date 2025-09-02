@@ -213,70 +213,139 @@ class ArbolBinario:
                     stack.append((nodo.getHijoIzquierdo(), False))
         return res
 # ============================================================
+    # 8) Altura
+    # ============================================================
+    def altura_recursiva(self):
+        """
+        Altura (en niveles). Árbol vacío -> 0.
+        Hoja -> 1. En general: 1 + máx(altura izq, altura der).
+        """
+        return self._altura_rec(self.raiz)
+
+    def _altura_rec(self, nodo):
+        if nodo is None:
+            return 0
+        return 1 + max(
+            self._altura_rec(nodo.getHijoIzquierdo()),
+            self._altura_rec(nodo.getHijoDerecho()),
+        )
+
+    def altura_iterativa(self):
+        """Altura por BFS (niveles)."""
+        if self.raiz is None:
+            return 0
+        from collections import deque
+
+        cola = deque([self.raiz])
+        niveles = 0
+        while cola:
+            for _ in range(len(cola)):
+                n = cola.popleft()
+                if n.getHijoIzquierdo():
+                    cola.append(n.getHijoIzquierdo())
+                if n.getHijoDerecho():
+                    cola.append(n.getHijoDerecho())
+            niveles += 1
+        return niveles
+
+    # ============================================================
+    # 9) Cantidad de nodos
+    # ============================================================
+    def cantidad_recursiva(self):
+        """Cantidad total de nodos (recursivo)."""
+        return self._cantidad_rec(self.raiz)
+
+    def _cantidad_rec(self, nodo):
+        if nodo is None:
+            return 0
+        return (
+            1
+            + self._cantidad_rec(nodo.getHijoIzquierdo())
+            + self._cantidad_rec(nodo.getHijoDerecho())
+        )
+
+    def cantidad_iterativa(self):
+        """Cantidad total de nodos (BFS)."""
+        if self.raiz is None:
+            return 0
+        from collections import deque
+
+        cola = deque([self.raiz])
+        conteo = 0
+        while cola:
+            n = cola.popleft()
+            conteo += 1
+            if n.getHijoIzquierdo():
+                cola.append(n.getHijoIzquierdo())
+            if n.getHijoDerecho():
+                cola.append(n.getHijoDerecho())
+        return conteo
+
+    # ============================================================
+    # 10) Amplitud (BFS)
+    # ============================================================
+    def amplitud(self):
+        """Recorrido por niveles (BFS) como lista plana de valores."""
+        if self.raiz is None:
+            return []
+        from collections import deque
+
+        cola = deque([self.raiz])
+        res = []
+        while cola:
+            n = cola.popleft()
+            res.append(n.getValor())
+            if n.getHijoIzquierdo():
+                cola.append(n.getHijoIzquierdo())
+            if n.getHijoDerecho():
+                cola.append(n.getHijoDerecho())
+        return res
+
+    def amplitud_por_niveles(self):
+        """Recorrido por niveles como lista de listas (niveles separados)."""
+        if self.raiz is None:
+            return []
+        from collections import deque
+
+        cola = deque([self.raiz])
+        niveles = []
+        while cola:
+            nivel = []
+            for _ in range(len(cola)):
+                n = cola.popleft()
+                nivel.append(n.getValor())
+                if n.getHijoIzquierdo():
+                    cola.append(n.getHijoIzquierdo())
+                if n.getHijoDerecho():
+                    cola.append(n.getHijoDerecho())
+            niveles.append(nivel)
+        return niveles
+
+
+# ============================================================
 # Ejemplo de uso
 # ============================================================
 if __name__ == "__main__":
     arbol = ArbolBinario()
+    datos = [100, 90, 120, 70, 75, 130, 200, 110, 95]
+    for v in datos:
+        arbol.insertar_nodo_iterativo(v)
 
-    print("=== Construcción del Árbol Binario ===")
-    print("Ingrese hasta 7 valores enteros para el árbol:")
+    print("Inorden (it):  ", arbol.inorden_iterativo())
+    print("Preorden (it): ", arbol.preorden_iterativo())
+    print("Postorden (it):", arbol.postorden_iterativo())
 
-    # ---------------------------------------
-    # Insertar valores por usuario (máx 7)
-    # ---------------------------------------
-    for i in range(7):
-        try:
-            valor = int(input(f"Ingrese valor {i+1}: "))
-            arbol.insertar_nodo_iterativo(valor)  # usando inserción iterativa
-        except ValueError:
-            print("Debe ingresar un número entero válido.")
-            break
+    print("Cantidad (rec):", arbol.cantidad_recursiva())
+    print("Cantidad (it): ", arbol.cantidad_iterativa())
+    print("Altura (rec):  ", arbol.altura_recursiva())
+    print("Altura (it):   ", arbol.altura_iterativa())
 
-    # ---------------------------------------
-    # Mostrar si el árbol está vacío
-    # ---------------------------------------
-    print("\n¿El árbol está vacío? (rec):", arbol.es_vacio_recursivo())
-    print("¿El árbol está vacío? (it):", arbol.es_vacio_iterativo())
+    print("Amplitud (BFS):", arbol.amplitud())
+    print("Por niveles:   ", arbol.amplitud_por_niveles())
 
-    # ---------------------------------------
-    # Recorridos
-    # ---------------------------------------
-    inorden = arbol.inorden_iterativo()
-    preorden = arbol.preorden_iterativo()
-    postorden = arbol.postorden_iterativo()
-
-    print("\nRecorridos del árbol:")
-    print("Inorden :", inorden)
-    print("Preorden:", preorden)
-    print("Postorden:", postorden)
-
-    # ---------------------------------------
-    # Búsqueda de un valor
-    # ---------------------------------------
-    try:
-        valor_buscar = int(input("\nIngrese un valor a buscar en el árbol: "))
-        nodo = arbol.buscar_x_iterativo(valor_buscar)
-
-        print(f"\nBuscar {valor_buscar} (rec):",
-              arbol.buscar_x_recursivo(valor_buscar) is not None)
-        print(f"Buscar {valor_buscar} (it):", nodo is not None)
-
-        if nodo:
-            # ¿Es hoja?
-            print(f"¿El nodo {valor_buscar} es hoja? (rec):",
-                  arbol.es_hoja_recursivo(nodo))
-            print(f"¿El nodo {valor_buscar} es hoja? (it):",
-                  arbol.es_hoja_iterativo(nodo))
-
-            # Revisar en qué recorrido(s) aparece
-            print(f"\nEl valor {valor_buscar} aparece en:")
-            if valor_buscar in inorden:
-                print(" - Inorden ✅")
-            if valor_buscar in preorden:
-                print(" - Preorden ✅")
-            if valor_buscar in postorden:
-                print(" - Postorden ✅")
-        else:
-            print(f"El valor {valor_buscar} no se encuentra en el árbol.")
-    except ValueError:
-        print("Debe ingresar un número entero válido.")
+    x = 95
+    nodo_x = arbol.buscar_x_iterativo(x)
+    print(f"Buscar {x}:    ", nodo_x is not None)
+    if nodo_x:
+        print(f"¿{x} es hoja? (rec):", arbol.es_hoja_recursivo(nodo_x))
+        print(f"¿{x} es hoja? (it): ", arbol.es_hoja_iterativo(nodo_x))
