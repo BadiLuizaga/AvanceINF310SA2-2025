@@ -296,6 +296,7 @@ class ArbolBinario:
     # ============================================================
     def amplitud(self):
         """Recorrido por niveles (BFS) como lista plana de valores."""
+         # Visita de izquierda a derecha en cada nivel.
         if self.raiz is None:
             return []
         from collections import deque
@@ -304,7 +305,8 @@ class ArbolBinario:
         res = []
         while cola:
             n = cola.popleft()
-            res.append(n.getValor())
+            res.append(n.getValor()) # visita el nodo
+            # Encola hijos para visitar en el orden correcto.
             if n.getHijoIzquierdo():
                 cola.append(n.getHijoIzquierdo())
             if n.getHijoDerecho():
@@ -312,7 +314,8 @@ class ArbolBinario:
         return res
 
     def amplitud_por_niveles(self):
-        """Recorrido por niveles como lista de listas (niveles separados)."""
+        """Recorrido por niveles como lista de listas, niveles separados."""
+        # Retorna lista de listas: cada sublista es un nivel del árbol.
         if self.raiz is None:
             return []
         from collections import deque
@@ -320,18 +323,76 @@ class ArbolBinario:
         cola = deque([self.raiz])
         niveles = []
         while cola:
-            nivel = []
+            nivel = [] # acumula los valores del nivel actual
+            # Tamaño actual de la cola = cantidad de nodos en este nivel.
             for _ in range(len(cola)):
                 n = cola.popleft()
                 nivel.append(n.getValor())
+                # Encola hijos para el siguiente nivel.
                 if n.getHijoIzquierdo():
                     cola.append(n.getHijoIzquierdo())
                 if n.getHijoDerecho():
                     cola.append(n.getHijoDerecho())
-            niveles.append(nivel)
+            niveles.append(nivel)  # cierra el nivel
         return niveles
+    # ============================================================
+    # 11) Eliminar 
+    # ============================================================
+    """
+    Elimina un valor del árbol binario de búsqueda.
+    Argumentos:
+        valor (int): El valor a eliminar del árbol.
+    Retorna:
+        None. (El árbol se actualiza internamente).
+    """
+    def eliminar(self, valor):
+        self.raiz = self._eliminarRecursivo(self.raiz, valor)
 
+    """
+    Función auxiliar recursiva para eliminar un nodo en el árbol.
+    Argumentos:
+        nodo (ClaseNodo | None): Nodo actual del recorrido.
+        valor (int): El valor a eliminar.
+    Retorna:
+        ClaseNodo | None: La nueva referencia del subárbol después de la eliminación.
+    """
+    def _eliminarRecursivo(self, nodo, valor):
+        if nodo is None:
+            return None
 
+        if valor < nodo.getValor():
+            nodo.setHijoIzquierdo(self._eliminarRecursivo(nodo.getHijoIzquierdo(), valor))
+        elif valor > nodo.getValor():
+            nodo.setHijoDerecho(self._eliminarRecursivo(nodo.getHijoDerecho(), valor))
+        else:
+            # Caso 1: sin hijos
+            if nodo.getHijoIzquierdo() is None and nodo.getHijoDerecho() is None:
+                return None
+            # Caso 2: un hijo
+            elif nodo.getHijoIzquierdo() is None:
+                return nodo.getHijoDerecho()
+            elif nodo.getHijoDerecho() is None:
+                return nodo.getHijoIzquierdo()
+            # Caso 3: dos hijos
+            else:
+                sucesor = self._minValorNodo(nodo.getHijoDerecho())
+                nodo.setValor(sucesor.getValor())
+                nodo.setHijoDerecho(self._eliminarRecursivo(nodo.getHijoDerecho(), sucesor.getValor()))
+
+        return nodo
+
+    """
+    Encuentra el nodo con el valor mínimo en un subárbol.
+    Argumentos:
+        nodo (ClaseNodo): Raíz del subárbol.
+    Retorna:
+        ClaseNodo: El nodo con el valor mínimo.
+    """
+    def _minValorNodo(self, nodo):
+        actual = nodo
+        while actual.getHijoIzquierdo() is not None:
+            actual = actual.getHijoIzquierdo()
+        return actual
 # ============================================================
 # Ejemplo de uso
 # ============================================================
